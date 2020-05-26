@@ -6,7 +6,7 @@ if [[ $# -eq 2 ]] ; then
     usermod -aG sudo ${1}
     sed -i 's/PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
     sed -i '/PasswordAuthentication/c\#PasswordAuthentication no' /etc/ssh/sshd_config
-    /etc/init.d/sshd restart
+    /etc/init.d/ssh restart
     apt update 
     apt upgrade -o Dpkg::Options::="--force-confold" --force-yes -y
     apt install -y unattended-upgrades
