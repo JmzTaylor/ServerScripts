@@ -1,9 +1,9 @@
 #!/bin/bash
 # bash <(curl -Ls https://raw.githubusercontent.com/JmzTaylor/ServerScripts/master/auto-update.sh) USERNAME 'PASSWORD'
 if [[ $# -eq 2 ]] ; then
-    useradd -s /bin/bash -m $1
+    useradd -s /bin/bash -m ${1}
     echo ${1}:${2} | chpasswd
-    usermod -aG ${1} sudo
+    usermod -aG sudo ${1}
     sed -i 's/PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
     sed -i '/PasswordAuthentication/c\#PasswordAuthentication no' /etc/ssh/sshd_config
     /etc/init.d/sshd restart
