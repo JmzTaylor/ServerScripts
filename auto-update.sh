@@ -3,6 +3,7 @@
 if [[ $# -eq 2 ]] ; then
     useradd -s /bin/bash -m $1
     echo ${1}:${2} | chpasswd
+    usermod -aG ${1} sudo
     apt update 
     apt upgrade -o Dpkg::Options::="--force-confold" --force-yes -y
     apt install -y unattended-upgrades
