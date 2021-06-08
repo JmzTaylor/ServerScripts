@@ -4,8 +4,19 @@ if [[ $# -eq 2 ]] ; then
     useradd -s /bin/bash -m ${1}
     echo ${1}:${2} | chpasswd
     usermod -aG sudo ${1}
+    echo "Hardening SSH"
     sed -i 's/PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
     sed -i '/PasswordAuthentication/c\#PasswordAuthentication no' /etc/ssh/sshd_config
+    ssh-keygen -M generate -O bits=2048 moduli-2048.candidates
+    ssh-keygen -M screen -f moduli-2048.candidates moduli-2048
+    mv moduli-2048 /etc/ssh/moduli
+    echo 'KexAlgorithms curve25519-sha256@libssh.org' >> /etc/ssh/sshd_config
+    echo 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr' >> /etc/ssh/sshd_config
+    echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com' >> /etc/ssh/sshd_config
+    sed -i 's/#HostKey \/etc\/ssh\/ssh_host_ed25519_key/HostKey \/etc\/ssh\/ssh_host_ed25519_key/g' /etc/ssh/sshd_config
+    sed -i 's/#HostKey \/etc\/ssh\/ssh_host_rsa_key\/HostKey \/etc\/ssh\/ssh_host_rsa_key/g' /etc/ssh/sshd_config
+    sed -i 's/X11Forwarding.*/X11Forwarding no/g' /etc/ssh/sshd_config
+    sed -i 's/PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
     /etc/init.d/ssh restart
     apt update 
     apt upgrade -o Dpkg::Options::="--force-confold" --force-yes -y
