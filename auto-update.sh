@@ -1,6 +1,7 @@
 #!/bin/bash
 # bash <(curl -Ls https://raw.githubusercontent.com/JmzTaylor/ServerScripts/master/auto-update.sh) USERNAME 'PASSWORD'
 if [[ $# -eq 2 ]] ; then
+    apt update && apt upgrade -y
     useradd -s /bin/bash -m ${1}
     echo ${1}:${2} | chpasswd
     usermod -aG sudo ${1}
