@@ -16,17 +16,13 @@ if [[ $# -eq 2 ]] ; then
         ssh-keygen -T moduli-2048 -f moduli-2048.candidates
     fi
     mv moduli-2048 /etc/ssh/moduli
-    echo 'KexAlgorithms curve25519-sha256@libssh.org' >> /etc/ssh/sshd_config
-    echo 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr' >> /etc/ssh/sshd_config
-    echo 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com' >> /etc/ssh/sshd_config
-    sed -i 's/^\#HostKey \/etc\/ssh\/ssh_host_\(rsa\|ed25519\)_key$/HostKey \/etc\/ssh\/ssh_host_\1_key/g' /etc/ssh/sshd_config
     sed -i 's/X11Forwarding.*/X11Forwarding no/g' /etc/ssh/sshd_config
     sed -i 's/PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
-    rm /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
     awk '$5 >= 3071' /etc/ssh/moduli > /etc/ssh/moduli.safe
     mv /etc/ssh/moduli.safe /etc/ssh/moduli
+    rm /etc/ssh/ssh_host_*
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    echo -e "\n# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com\n# hardening guide.\nKexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr\nMACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com" >> /etc/ssh/sshd_config
     /etc/init.d/ssh restart
     apt update 
     apt upgrade -o Dpkg::Options::="--force-confold" --force-yes -y
